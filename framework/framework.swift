@@ -8,16 +8,9 @@ type shellfile;
 type exefile;
 type reducefile;
 type resultfile;
-type word {
-  string w;
-  int c;
-}
-type fullcount {
-  word words[];
-}
 
 //input files
-inputfile inputfiles[] <filesys_mapper;location="files/",suffix=".txt">;
+inputfile inputfiles[] <filesys_mapper;location=@arg("filedir","files/"),suffix=".txt">;
 
 
 shellfile mapreduce_shell_script<single_file_mapper;file=@arg("shellscript","mapreduce.sh")>;
@@ -25,29 +18,22 @@ exefile map_fun<single_file_mapper;file=@arg("mapfn","mapcount.py")>;
 exefile combine_fun<single_file_mapper;file=@arg("combinefn","combinecount.py")>;
 exefile reduce_fun<single_file_mapper;file=@arg("reducefn","reducecount.py")>;
 exefile aggregate_fun<single_file_mapper;file=@arg("aggregatefn","aggregatecount.py")>;
+shellfile agg_sh<single_file_mapper;file=@arg("aggregatesh","aggregate.sh")>;
 
 //code for running python in shell
 app (reducefile sout) runmapreduce(shellfile shellscript, inputfile f, exefile map, exefile combine, exefile reduce){
       shell @shellscript @f @map @combine @reduce stdout=@filename(sout);
 }
-app (resultfile sout) runaggregate(exefile aggregate, reducefile redfiles[]){
-      python @aggregate @filename(redfiles) stdout=@filename(sout);
-}
-app() touchfun(resultfile res) {
-  touch res;
+(external t) getFnames(reducefile redfiles[]) {
 }
 
 
-//TODO: implement a map-reduce framework on alternate functionalities
-//and modify swift to take more structural approaches to map-reduce
+(resultfile f) runaggregate(exefile aggfn, reducefile redfiles[]) {
+  app {
+      python @aggfn @filename(redfiles) stdout=@filename(f);
+  }
+}
 
-/*TODO: fix issue with granularity
- right now, the map-reduce is done on the granularity of files,
- what we want is for this to be made coarser, or in other words,
- produce an aggregate reduce file for all files on a given node,
- not multiple files per node.  This requires modification of the language
- to include an aggregate function to run at the end of the script
-*/
 
 /*
 this is where the distributed map (combine, and reduce) will occur
@@ -60,11 +46,12 @@ foreach f in inputfiles {
                  match="(.*)txt",
                  transform="\\1reduce">;
   r = runmapreduce(mapreduce_shell_script,f,map_fun,combine_fun,reduce_fun);
-
 }
 
-resultfile result<single_file_mapper;file="result.txt">;
+//resultfile result<single_file_mapper;file=@arg("resultfile","result.txt")>;
+resultfile result<"result.txt">;
 reducefile reducefiles[]<filesys_mapper;files="files/*.reduce">;
 
-touchfun(result);
+//external result;
+//string resFile = @arg("resultfile","result.txt");
 result = runaggregate(aggregate_fun,reducefiles);

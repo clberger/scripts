@@ -3,8 +3,8 @@ from sys import argv
 import os
 
 result = {}
-files = os.listdir("files/_concurrent")
-files = ["files/_concurrent/"+filename for filename in files if ".reduce" in filename]
+files = os.listdir("files/")
+files = ["files/"+filename for filename in files if ".counted" in filename]
 fout = open(argv[1],"w")
 
 def process_line(line,result):
@@ -23,5 +23,4 @@ for f in files:
 
 for key,value in result.items():
   fout.write(key + "," + str(value)+"\n")
-  #print key + "," + str(value)
 fout.close()

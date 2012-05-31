@@ -29,7 +29,7 @@
      		<typestructure></typestructure>
      	</type>   
   </types>  
-  <procedure name="runmapreduce" src="line 24">
+  <procedure name="runmapreduce" src="line 22">
 
       <output 
     name="sout" type="reducefile"
@@ -61,7 +61,7 @@
 
      xsi:nil="true" />
     <binding>
-      <application src="line 24">
+      <application src="line 22">
         <executable>shell</executable>
         <stdout><function name="filename">
           <variableReference>sout</variableReference></function></stdout><function name="filename">
@@ -72,7 +72,7 @@
           <variableReference>reduce</variableReference></function>  </application>
     </binding>
   </procedure>
-  <procedure name="getFnames" src="line 27">
+  <procedure name="getFnames" src="line 25">
 
       <output 
     name="t" type="external"
@@ -115,7 +115,7 @@
         <stringConstant>reducefn</stringConstant><stringConstant>reducecount.py</stringConstant></function></param>
     </mapping>
   </variable>
-  <foreach var="f"  src="line 43">
+  <foreach var="f"  src="line 33">
   <in><variableReference>inputfiles</variableReference></in>
   <body><variable name="r" type="reducefile" isGlobal="false">
       <mapping descriptor="regexp_mapper">
@@ -125,7 +125,7 @@
         <param name="transform"><stringConstant>\1reduce</stringConstant></param>
       </mapping>
     </variable>
-    <call proc="runmapreduce" src="line 48">
+    <call proc="runmapreduce" src="line 38">
       <output><variableReference>r</variableReference></output>
       <input><variableReference>mapreduce_shell_script</variableReference></input>
       <input><variableReference>f</variableReference></input>

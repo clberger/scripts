@@ -84,37 +84,6 @@
 
      xsi:nil="true" />
   </procedure>
-  <procedure name="runaggregate" src="line 30">
-
-      <output 
-    name="f" type="resultfile"
-
-     xsi:nil="true" />
-
-      <input 
-    name="aggsh" type="shellfile"
-
-     xsi:nil="true" />
-
-      <input 
-    name="aggfn" type="exefile"
-
-     xsi:nil="true" />
-
-      <input 
-    name="redfiles" type="reducefile[]"
-
-     xsi:nil="true" />
-    <binding>
-      <application src="line 31">
-        <executable>shell</executable>
-        <function name="filename">
-          <variableReference>aggsh</variableReference></function><function name="filename">
-          <variableReference>aggfn</variableReference></function><function name="filename">
-          <variableReference>redfiles</variableReference></function><function name="filename">
-          <variableReference>f</variableReference></function>  </application>
-    </binding>
-  </procedure>
   <variable name="inputfiles" type="inputfile[]" isGlobal="false">
     <mapping descriptor="filesys_mapper">
       <param name="location"><function name="arg">
@@ -146,19 +115,7 @@
         <stringConstant>reducefn</stringConstant><stringConstant>reducecount.py</stringConstant></function></param>
     </mapping>
   </variable>
-  <variable name="aggregate_fun" type="exefile" isGlobal="false">
-    <mapping descriptor="single_file_mapper">
-      <param name="file"><function name="arg">
-        <stringConstant>aggregatefn</stringConstant><stringConstant>aggregatecount.py</stringConstant></function></param>
-    </mapping>
-  </variable>
-  <variable name="agg_sh" type="shellfile" isGlobal="false">
-    <mapping descriptor="single_file_mapper">
-      <param name="file"><function name="arg">
-        <stringConstant>aggregatesh</stringConstant><stringConstant>aggregate.sh</stringConstant></function></param>
-    </mapping>
-  </variable>
-  <foreach var="f"  src="line 42">
+  <foreach var="f"  src="line 43">
   <in><variableReference>inputfiles</variableReference></in>
   <body><variable name="r" type="reducefile" isGlobal="false">
       <mapping descriptor="regexp_mapper">
@@ -168,7 +125,7 @@
         <param name="transform"><stringConstant>\1reduce</stringConstant></param>
       </mapping>
     </variable>
-    <call proc="runmapreduce" src="line 47">
+    <call proc="runmapreduce" src="line 48">
       <output><variableReference>r</variableReference></output>
       <input><variableReference>mapreduce_shell_script</variableReference></input>
       <input><variableReference>f</variableReference></input>
@@ -177,16 +134,4 @@
       <input><variableReference>reduce_fun</variableReference></input>
     </call></body>
   </foreach>
-  <variable name="result" type="resultfile" isGlobal="false"><file name="result.txt"/></variable>
-  <variable name="reducefiles" type="reducefile[]" isGlobal="false">
-    <mapping descriptor="filesys_mapper">
-      <param name="files"><stringConstant>files/*.reduce</stringConstant></param>
-    </mapping>
-  </variable>
-  <call proc="runaggregate" src="line 56">
-    <output><variableReference>result</variableReference></output>
-    <input><variableReference>agg_sh</variableReference></input>
-    <input><variableReference>aggregate_fun</variableReference></input>
-    <input><variableReference>reducefiles</variableReference></input>
-  </call>
 </program>
